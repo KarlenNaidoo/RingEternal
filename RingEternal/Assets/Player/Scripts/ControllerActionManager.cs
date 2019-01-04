@@ -29,6 +29,7 @@ public class ControllerActionManager : PlayerInput
     public void MapControllerAtkActions()
     {
         WeaponList weaponList = blackboard.weaponList;
+        Debug.Log("Current weapon status: " + blackboard.currentWeapon);
         switch (blackboard.currentWeapon)
         {
             case WeaponStatus.OneHanded:
@@ -85,9 +86,12 @@ public class ControllerActionManager : PlayerInput
     public ControllerActionInput GetActionInput ()
     {
         if (playerActions.LightAttack.WasPressed)
-            return ControllerActionInput.R1;            
+        {
+            Debug.Log("Light attack pressed!");
+            return ControllerActionInput.Square;
+        }
         if (playerActions.HeavyAttack.WasPressed)
-            return ControllerActionInput.R2;
+            return ControllerActionInput.Triangle;
         if (playerActions.Phase.WasPressed)
             return ControllerActionInput.L1;
         if (playerActions.Crouch.WasPressed)
@@ -107,18 +111,7 @@ public class ControllerActionManager : PlayerInput
             blackboard.currentWeapon = WeaponStatus.TwoHanded;
     }
 
-    public void CanAttack()
-    {
-        blackboard.canAttack = true;
-        blackboard.doOnce = false;
-    }
 
-    public void CloseCanAttack()
-    {
-
-        //Debug.Log("Closing can attack");
-        //blackboard.canAttack = false;
-    }
     WeaponAction GetAction(ControllerActionInput input)
     {
         for (int i = 0; i < actionSlots.Count; i++)

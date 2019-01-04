@@ -18,7 +18,7 @@ public class LockOnTarget : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Hit an enemy");
+        Debug.Log("Hit an enemy: " + other.gameObject.name);
         blackboard.lockTarget = other.transform;
     }
 }

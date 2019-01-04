@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 /* Actually moves the player
- * It accepts input from PlayerInput, it gets the values froom the MovementController about its transitions, and how to move from the PlayerMotor
+ * It accepts input from PlayerInput, it gets the values from the MovementController about its transitions, and how to move from the PlayerMotor
  */
 
 namespace Player.PlayerController
@@ -30,11 +30,9 @@ namespace Player.PlayerController
 
         // get Layers from the Animator Controller
         [HideInInspector]
-        public AnimatorStateInfo baseLayerInfo, underBodyInfo, rightArmInfo, leftArmInfo, fullBodyInfo, upperBodyInfo;
+        public AnimatorStateInfo baseLayerInfo, rightArmInfo, leftArmInfo, fullBodyInfo, upperBodyInfo;
         private int baseLayer
         { get { return blackboard.animator.GetLayerIndex("Base Layer"); } }
-        private int underBodyLayer
-        { get { return blackboard.animator.GetLayerIndex("UnderBody"); } }
         private int rightArmLayer
         { get { return blackboard.animator.GetLayerIndex("RightArm"); } }
         private int leftArmLayer
@@ -81,7 +79,7 @@ namespace Player.PlayerController
         {
             if (blackboard.animator == null)
             {
-                Debug.Log("Animator not set correctly");
+                Debug.Log("Animator is null in blackboard. Please check");
                 return;
             }
             LayerControl();
@@ -98,11 +96,13 @@ namespace Player.PlayerController
             if (blackboard.actionSlot != null && fullBodyInfo.IsName("ResetState")) // we need to be in the empty state in order to transition
             {
                 targetAnim = blackboard.actionSlot.targetAnim;
+                Debug.Log("Play target animation: " + targetAnim);
                 blackboard.animator.Play(targetAnim);
-
             }
+
             else if (blackboard.actionSlot == null && fullBodyInfo.IsName("ResetState"))
             {
+                Debug.Log("Cannot attack if action slots are null");
                 blackboard.canAttack = false;
                 blackboard.doOnce = false;
             }
@@ -113,13 +113,13 @@ namespace Player.PlayerController
             if (blackboard.canAttack)
             {
                 ControllerActionInput a_input = controllerActionManager.GetActionInput();
-                if (a_input == ControllerActionInput.R1 && !blackboard.doOnce)
+                if (a_input == ControllerActionInput.Square && !blackboard.doOnce)
                 {
                     blackboard.animator.SetTrigger("LightAttack");
                     blackboard.doOnce = true;
                     return;
                 }
-                if (a_input == ControllerActionInput.R2 && !blackboard.doOnce)
+                if (a_input == ControllerActionInput.Triangle && !blackboard.doOnce)
                 {
                     blackboard.animator.SetTrigger("HeavyAttack");
                     blackboard.doOnce = true;
@@ -202,6 +202,22 @@ namespace Player.PlayerController
         {
             Vector3 local = parentTransform.InverseTransformDirection(worldDirection);
             return Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg;
+        }
+
+        // This function is called from an Animation Event
+        public void CanAttack()
+        {
+            blackboard.canAttack = true;
+            blackboard.doOnce = false;
+        }
+
+
+        // This function is called from an Animation Event
+        public void CannotAttack()
+        {
+
+            Debug.Log("Closing can attack");
+            blackboard.canAttack = false;
         }
         protected virtual void Update()
         {

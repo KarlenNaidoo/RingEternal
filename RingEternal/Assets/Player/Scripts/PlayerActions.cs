@@ -1,4 +1,8 @@
-﻿namespace Player.Input
+﻿/**
+ * This is responsible for all input capability in the game to allow it to access controllers and keypads
+ * Edit this if including a new moveset
+ */
+namespace Player.Input
 {
     using InControl;
     using UnityEngine;
