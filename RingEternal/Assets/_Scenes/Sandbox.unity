@@ -565,7 +565,7 @@ MonoBehaviour:
     twoHandedSwordActions: []
     meleeActions:
     - inputButton: 0
-      targetAnim: Light1
+      targetAnim: ight11
     - inputButton: 1
       targetAnim: Light2
 --- !u!1 &1035305343
@@ -768,6 +768,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: Camera Rig
       objectReference: {fileID: 0}
+    - target: {fileID: 114195181474745236, guid: 026b3fc896170524a82e36967e7a66ee,
+        type: 3}
+      propertyPath: blackboard
+      value: 
+      objectReference: {fileID: 28568782}
+    - target: {fileID: 114195181474745236, guid: 026b3fc896170524a82e36967e7a66ee,
+        type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 1035305348}
+    - target: {fileID: 114195181474745236, guid: 026b3fc896170524a82e36967e7a66ee,
+        type: 3}
+      propertyPath: distance
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114195181474745236, guid: 026b3fc896170524a82e36967e7a66ee,
+        type: 3}
+      propertyPath: offSetPlayerPivot
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4707748149874096, guid: 026b3fc896170524a82e36967e7a66ee, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -811,26 +831,6 @@ PrefabInstance:
     - target: {fileID: 4707748149874096, guid: 026b3fc896170524a82e36967e7a66ee, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114195181474745236, guid: 026b3fc896170524a82e36967e7a66ee,
-        type: 3}
-      propertyPath: blackboard
-      value: 
-      objectReference: {fileID: 28568782}
-    - target: {fileID: 114195181474745236, guid: 026b3fc896170524a82e36967e7a66ee,
-        type: 3}
-      propertyPath: target
-      value: 
-      objectReference: {fileID: 1035305348}
-    - target: {fileID: 114195181474745236, guid: 026b3fc896170524a82e36967e7a66ee,
-        type: 3}
-      propertyPath: distance
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 114195181474745236, guid: 026b3fc896170524a82e36967e7a66ee,
-        type: 3}
-      propertyPath: offSetPlayerPivot
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 026b3fc896170524a82e36967e7a66ee, type: 3}

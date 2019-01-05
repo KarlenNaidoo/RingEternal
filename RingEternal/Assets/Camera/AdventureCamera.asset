@@ -17,7 +17,7 @@ MonoBehaviour:
   - Name: MovementState
     forward: 60
     right: 0
-    defaultDistance: 7
+    defaultDistance: 5
     maxDistance: 10
     minDistance: 4
     height: 0
