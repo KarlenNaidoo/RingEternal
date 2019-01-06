@@ -248,7 +248,7 @@ public static class DamageHelper
 
 public enum WeaponStatus { None, OneHanded, TwoHanded }
 
-public enum ControllerActionInput { Square, Triangle, L1, L2, None }
+public enum ControllerActionInput { Square, Triangle, L1, L2, None , X}
 
 public enum LocomotionType { Free, Strafe }
 

@@ -10,7 +10,7 @@ public class CameraManager: PlayerInput
 
     [Header("References")]
 
-    public ThirdPersonCamera cam;              // acess camera info
+    public ThirdPersonCamera cam;              // access camera info
 
 
     public bool ignoreCameraRotation;
@@ -30,7 +30,7 @@ public class CameraManager: PlayerInput
         if (!Camera.main) Debug.Log("Missing a Camera with the tag MainCamera, please add one.");
         if (!ignoreCameraRotation)
         {
-            RotateWithCamera(Camera.main.transform);
+            RotateWithCamera(cam.transform);
         }
 
         if (cam == null)
@@ -41,7 +41,6 @@ public class CameraManager: PlayerInput
         //var zoom = Input.GetAxis("Mouse ScrollWheel");
 
         cam.RotateCamera(X, Y);
-        //tpCamera.Zoom(zoom);
 
         // change keepDirection from input difference
         if (keepDirection && Vector2.Distance(blackboard.input, blackboard.oldInput) > 0.2f) keepDirection = false;

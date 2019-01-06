@@ -402,6 +402,7 @@ namespace Player
         {
             if(Mathf.Abs(x) > 0 || Mathf.Abs(y) > 0)
             {
+                Debug.Log("Look in camera direction being called from Rotate Camera");
                 blackboard.lookInCameraDirection = true;
             }
             else
