@@ -4,7 +4,7 @@
  * It accepts input from PlayerInput, it gets the values from the MovementController about its transitions, and how to move from the PlayerMotor
  */
 
-namespace Player.PlayerController
+namespace RingEternal.MyThirdPersonController
 {
     public class PlayerAnimator : MonoBehaviour
     {
@@ -42,6 +42,8 @@ namespace Player.PlayerController
         private int fullbodyLayer
         { get { return blackboard.animator.GetLayerIndex("FullBody"); } }
 
+        private bool smoothFollow;
+
         protected virtual void Awake()
         {
             controllerActionManager = blackboard.controllerActionManager;
@@ -51,6 +53,8 @@ namespace Player.PlayerController
         {
 
             lastForward = parentTransform.forward;
+            smoothFollow = blackboard.smoothFollow;
+            
         }
 
         public void OnAnimatorMove()
@@ -164,11 +168,11 @@ namespace Player.PlayerController
             angle = Mathf.Clamp(angle / Time.deltaTime, -1f, 1f);
             // Update Animator params
             blackboard.animator.SetFloat("Turn", Mathf.Lerp(blackboard.animator.GetFloat("Turn"), angle, Time.deltaTime * turnSpeed));
-            blackboard.animator.SetFloat("InputVertical", blackboard.animState.vertical);
-            blackboard.animator.SetFloat("InputHorizontal", blackboard.animState.horizontal);
+            blackboard.animator.SetFloat("InputVertical", blackboard.animState.moveDirection.z);
+            blackboard.animator.SetFloat("InputHorizontal", blackboard.animState.moveDirection.x);
             blackboard.animator.SetBool("OnGround", blackboard.animState.onGround);
             blackboard.animator.SetBool("IsStrafing", blackboard.animState.isStrafing);
-            blackboard.animator.SetFloat("MovementMagnitude", (Mathf.Abs(blackboard.animState.vertical) + Mathf.Abs(blackboard.animState.horizontal)));
+            blackboard.animator.SetFloat("MovementMagnitude", (Mathf.Abs(blackboard.animState.moveDirection.z) + Mathf.Abs(blackboard.animState.moveDirection.x)));
             if (blackboard.isSprinting && blackboard.currentSprintStamina > 0)
             {
                 blackboard.speed = PlayerBlackboard.SPRINT_SPEED;

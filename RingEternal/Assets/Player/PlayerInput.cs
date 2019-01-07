@@ -7,7 +7,7 @@ using Player.Input;
  * Any extension class to deal with player input will be added to this class
  */
 
-namespace Player.PlayerController
+namespace RingEternal.MyThirdPersonController
 {
     public class PlayerInput : MonoBehaviour
     {
@@ -16,6 +16,17 @@ namespace Player.PlayerController
         [SerializeField] protected PlayerBlackboard blackboard;
 
 
+        // Input state
+        public struct State
+        {
+            public Vector3 move;
+            public Vector3 lookPos;
+            public bool crouch;
+            public bool jump;
+            public int actionIndex;
+        }
+
+        public State state = new State();			// The current state of the user input
         protected PlayerActions playerActions;
         string saveData;
         

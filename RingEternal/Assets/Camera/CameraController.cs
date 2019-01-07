@@ -30,7 +30,7 @@ namespace RingEternal.MyCamera {
 		public Vector3 offset = new Vector3(0, 1.5f, 0.5f); // The offset from target relative to camera rotation
 		public float followSpeed = 10f; // Smooth follow speed
 
-		[Header("Rotation")]
+		[Header("Rotation")] //TODO: Create ranges for these values
 		public float rotationSensitivity = 3.5f; // The sensitivity of rotation
 		public float yMinLimit = -20; // Min vertical angle
 		public float yMaxLimit = 80; // Max vertical angle
@@ -67,6 +67,8 @@ namespace RingEternal.MyCamera {
 
 		// Initiate, set the params to the current transformation of the camera relative to the target
 		protected virtual void Awake () {
+            if (!cam)
+                Debug.Log("Please assign a main camera to the Reference field on this script");
 			Vector3 angles = transform.eulerAngles;
 			x = angles.y;
 			y = angles.x;
@@ -147,7 +149,7 @@ namespace RingEternal.MyCamera {
 			if (target != null) {
 				// Distance
 				distance += (distanceTarget - distance) * zoomSpeed * deltaTime;
-                Debug.Log("Distance to target is " + distance);
+
 				// Smooth follow
 				if (!smoothFollow) smoothPosition = target.position;
 				else smoothPosition = Vector3.Lerp(smoothPosition, target.position, deltaTime * followSpeed);

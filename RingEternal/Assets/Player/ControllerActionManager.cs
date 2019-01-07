@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using static Player.Utility;
-using Player.PlayerController;
+using RingEternal.MyThirdPersonController;
 
 public class ControllerActionManager : PlayerInput
 { 
@@ -29,7 +29,7 @@ public class ControllerActionManager : PlayerInput
     public void MapControllerAtkActions()
     {
         WeaponList weaponList = blackboard.weaponList;
-        Debug.Log("Current weapon status: " + blackboard.currentWeapon);
+        //Debug.Log("Current weapon status: " + blackboard.currentWeapon);
         switch (blackboard.currentWeapon)
         {
             case WeaponStatus.OneHanded:
@@ -87,7 +87,6 @@ public class ControllerActionManager : PlayerInput
     {
         if (playerActions.LightAttack.WasPressed)
         {
-            Debug.Log("Light attack pressed!");
             return ControllerActionInput.Square;
         }
         if (playerActions.HeavyAttack.WasPressed)

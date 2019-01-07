@@ -1,51 +1,52 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Player.PlayerController;
-using Player;
+using RingEternal.MyCharacter;
 
-public class StateManager : PlayerMotor, IHitboxResponder
+namespace RingEternal.MyThirdPersonController
 {
-    
-    [SerializeField] float maxSprintStamina = 10f;
-    [Header("References")]
-    [SerializeField] HitBox _hitbox;
-    [SerializeField] PlayerHitboxController _hitboxController;
-    public HitboxProfile[] hitboxProfile;
 
-    protected override void Awake()
+    public class StateManager : PlayerMotor, IHitboxResponder
     {
-        base.Awake();
+
+        [SerializeField] float maxSprintStamina = 10f;
+        [Header("References")]
+        [SerializeField] HitBox _hitbox;
+        [SerializeField] PlayerHitboxController _hitboxController;
+        public HitboxProfile[] hitboxProfile;
+
+
+        protected override void Start()
+        {
+            base.Start();
+            _blackboard.maxSprintStamina = maxSprintStamina;
+            _blackboard.currentSprintStamina = maxSprintStamina;
+        }
+
+
+
+
+
+        public void PlayHurtAnimation(bool value)
+        {
+            _blackboard.animator.Play("Idle_Hit_Strong_Right");
+        }
+
+
+        public void CollidedWith(Collider collider)
+        {
+            Debug.Log("Player collided with " + collider.gameObject.name);
+            Hurtbox hurtbox = collider.GetComponent<Hurtbox>();
+            IHealthController hurtBoxController = hurtbox.GetComponentInParent<IHealthController>(); // the parent gameobject will implement the health and damage
+            Damage attackDamage = new Damage(15);
+            hurtBoxController?.ReceiveDamage(attackDamage);
+        }
+
+
+        private void SetResponderToHitbox()
+        {
+            Debug.Log("Setting player as responder to hitbox");
+            //_hitbox.SetResponder(this);
+        }
     }
-    protected override void Start()
-    {
-        base.Start();
-        _blackboard.maxSprintStamina = maxSprintStamina;
-        _blackboard.currentSprintStamina = maxSprintStamina;
-    }
-    
 
-    
-
-
-    public override void PlayHurtAnimation(bool value)
-    {
-        blackboard.animator.Play("Idle_Hit_Strong_Right");
-    }
-    
-
-    public void CollidedWith(Collider collider)
-    {
-        Debug.Log("Player collided with " + collider.gameObject.name);
-        Hurtbox hurtbox = collider.GetComponent<Hurtbox>();
-        IHealthController hurtBoxController = hurtbox.GetComponentInParent<IHealthController>(); // the parent gameobject will implement the health and damage
-        Damage attackDamage = new Damage(15);
-        hurtBoxController?.ReceiveDamage(attackDamage);
-    }
-
-
-    private void SetResponderToHitbox()
-    {
-        Debug.Log("Setting player as responder to hitbox");
-        _hitbox.SetResponder(this);
-    }
 }
