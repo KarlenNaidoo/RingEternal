@@ -26,7 +26,11 @@ namespace RingEternal.MyThirdPersonController
             public int actionIndex;
         }
 
-        public State state = new State();			// The current state of the user input
+        public State state = new State();           // The current state of the user input
+        [SerializeField] Transform cam;             // Reference to camera.main
+
+        #region Setting up InControl
+
         protected PlayerActions playerActions;
         string saveData;
         
@@ -38,7 +42,6 @@ namespace RingEternal.MyThirdPersonController
 
             LoadBindings();
         }
-
 
         void OnDisable()
         {
@@ -71,10 +74,15 @@ namespace RingEternal.MyThirdPersonController
             PlayerPrefs.Save();
         }
 
-        
+
+        #endregion
+
         protected virtual void Update()
         {
             HandleInput();
+
+            // calculate the head look target position
+            state.lookPos = transform.position + cam.forward * 100f;
         }
 
 
@@ -88,18 +96,24 @@ namespace RingEternal.MyThirdPersonController
 
         protected virtual void StoreMovement()
         {
-            
 
-                blackboard.SetPlayerInputParameters(playerActions.Move.X, playerActions.Move.Y);
+
+            // calculate move direction
+            Vector3 move = cam.rotation * new Vector3(playerActions.Move.X, 0f, playerActions.Move.Y).normalized;
+
+            // Flatten move vector to the character.up plane
+            if (move != Vector3.zero)
+            {
+                Vector3 normal = transform.up;
+                Vector3.OrthoNormalize(ref normal, ref move);
+                state.move = move;
+            }
+            else state.move = Vector3.zero;
+
+            float speedMultiplier = (blackboard.runByDefault) ? 1.5f : 1f; // Set the correct speed value to pass to animator
+
+            state.move *= speedMultiplier;
             
-            if (blackboard.runByDefault)
-            {
-                blackboard.speed = Mathf.Abs(playerActions.Move.Y) + 1;
-            }
-            else
-            {
-                blackboard.speed = Mathf.Abs(playerActions.Move.Y);
-            }
         }
         
         
@@ -112,12 +126,10 @@ namespace RingEternal.MyThirdPersonController
             }
             else
             {
-
                 blackboard.isSprinting = false;
                 IncreaseSprintStamina(blackboard.currentSprintStamina);
             }
         }
-        
 
         protected virtual void DecreaseSprintStamina(float currentSprintStamina)
         {
@@ -138,23 +150,7 @@ namespace RingEternal.MyThirdPersonController
             }
             blackboard.currentSprintStamina = currentSprintStamina;
         }
-
-        //protected virtual void CheckForCrouch()
-        //{
-        //        if (playerActions.Crouch)
-        //        {
-        //            blackboard.isCrouching = true;
-        //            AudioManager.instance.Pause("Theme");
-        //            AudioManager.instance.Play("Crouch");
-        //        }
-        //        else
-        //        {
-        //            blackboard.isCrouching = false;
-        //            AudioManager.instance.StopPlaying("Crouch");
-        //            AudioManager.instance.Play("Theme");
-        //    }
-        //}
-
+        
 
     }
 }

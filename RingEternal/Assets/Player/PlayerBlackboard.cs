@@ -83,6 +83,7 @@ public class PlayerBlackboard : MonoBehaviour, IBlackboard
     // New
     public bool smoothFollow { get; set; }
     public AnimState animState { get; set; }
+    public Vector3 deltaPosition {get; set; }
 
     // Animation state
     public struct AnimState

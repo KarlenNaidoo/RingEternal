@@ -170,14 +170,11 @@ namespace RingEternal.MyThirdPersonController
             // Fill in animState
             _animState.onGround = onGround;
             _animState.moveDirection = GetMoveDirection();
+            Debug.Log("ANIM MOVE DIRECTION IS " + _animState.moveDirection);
             _animState.yVelocity = Mathf.Lerp(_blackboard.animState.yVelocity, velocityY, Time.deltaTime * 10f);
             _animState.crouch = _playerInput.state.crouch;
             _animState.isStrafing = moveMode == MoveMode.Strafe;
             _blackboard.animState = _animState;
-            Debug.Log("Player grounded? " + onGround);
-            Debug.Log("Move direction?  " + GetMoveDirection());
-            Debug.Log("Horizontal? " + _animState.moveDirection.x);
-            Debug.Log("Vertical? " + _animState.moveDirection.z);
 
         }
 
@@ -242,8 +239,11 @@ namespace RingEternal.MyThirdPersonController
             rb.velocity = horizontalVelocity + verticalVelocity;
 
             // Dampering forward speed on the slopes
-            float slopeDamper = !onGround ? 1f : GetSlopeDamper(-deltaPosition / Time.deltaTime, normal);
+            float slopeDamper = !onGround ? 1f : GetSlopeDamper(-_blackboard.deltaPosition / Time.deltaTime, normal);
+            Debug.Log("delta position " + _blackboard.deltaPosition);
             forwardMlp = Mathf.Lerp(forwardMlp, slopeDamper, Time.deltaTime * 5f);
+
+            Debug.Log("forwardMlp " + forwardMlp);
         }
 
         // Processing horizontal wall running
@@ -345,7 +345,6 @@ namespace RingEternal.MyThirdPersonController
         private Vector3 GetForwardDirection()
         {
             bool isMoving = _playerInput.state.move != Vector3.zero;
-
             switch (moveMode)
             {
                 case MoveMode.Directional:

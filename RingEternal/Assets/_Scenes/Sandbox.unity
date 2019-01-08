@@ -122,7 +122,6 @@ GameObject:
   m_Component:
   - component: {fileID: 28568783}
   - component: {fileID: 28568782}
-  - component: {fileID: 28568781}
   m_Layer: 9
   m_Name: PlayerState
   m_TagString: Untagged
@@ -130,59 +129,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &28568781
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 28568780}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fbda1dfa887c674a96cca57d6bfe78c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gravityTarget: {fileID: 0}
-  gravityMultiplier: 2
-  airborneThreshold: 0.6
-  slopeStartAngle: 50
-  slopeEndAngle: 85
-  spherecastRadius: 0.1
-  groundLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  capsule: {fileID: 0}
-  rb: {fileID: 0}
-  _blackboard: {fileID: 0}
-  moveMode: 0
-  smoothPhysics: 1
-  smoothAccelerationTime: 0.2
-  linearAccelerationSpeed: 3
-  platformFriction: 7
-  groundStickyEffect: 4
-  maxVerticalVelocityOnGround: 3
-  velocityToGroundTangentWeight: 0
-  lookInCameraDirection: 0
-  turnSpeed: 5
-  stationaryTurnSpeedMlp: 1
-  airSpeed: 6
-  airControl: 2
-  jumpPower: 12
-  jumpRepeatDelayTime: 0
-  wallRunLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  wallRunMaxLength: 1
-  wallRunMinMoveMag: 0.6
-  wallRunMinVelocityY: -1
-  wallRunRotationSpeed: 1.5
-  wallRunMaxRotationAngle: 70
-  wallRunWeightSpeed: 5
-  crouchCapsuleScaleMlp: 0.6
-  maxSprintStamina: 10
-  _hitbox: {fileID: 0}
-  _hitboxController: {fileID: 0}
-  hitboxProfile: []
 --- !u!114 &28568782
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -604,6 +550,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rigidbody: {fileID: 1035305344}
   blackboard: {fileID: 28568782}
+  cam: {fileID: 1497562628}
   actionSlots:
   - inputButton: 0
     targetAnim: 
@@ -635,9 +582,9 @@ MonoBehaviour:
     twoHandedSwordActions: []
     meleeActions:
     - inputButton: 0
-      targetAnim: ight11
+      targetAnim: LightAtk1
     - inputButton: 1
-      targetAnim: Light2
+      targetAnim: LightAtk1
 --- !u!1 &1035305343
 GameObject:
   m_ObjectHideFlags: 0
@@ -651,6 +598,7 @@ GameObject:
   - component: {fileID: 1035305346}
   - component: {fileID: 1035305345}
   - component: {fileID: 1035305344}
+  - component: {fileID: 1035305349}
   m_Layer: 0
   m_Name: Animator Controller
   m_TagString: Untagged
@@ -744,6 +692,61 @@ Transform:
   m_Father: {fileID: 6666743498978451340}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1035305349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1035305343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fbda1dfa887c674a96cca57d6bfe78c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gravityTarget: {fileID: 0}
+  gravityMultiplier: 2
+  airborneThreshold: 0.6
+  slopeStartAngle: 50
+  slopeEndAngle: 85
+  spherecastRadius: 0.1
+  groundLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  capsule: {fileID: 1035305346}
+  rb: {fileID: 1035305344}
+  _blackboard: {fileID: 28568782}
+  _cam: {fileID: 1497562625}
+  _playerInput: {fileID: 885713910}
+  moveMode: 0
+  smoothPhysics: 1
+  smoothAccelerationTime: 0.2
+  linearAccelerationSpeed: 3
+  platformFriction: 7
+  groundStickyEffect: 4
+  maxVerticalVelocityOnGround: 3
+  velocityToGroundTangentWeight: 0
+  lookInCameraDirection: 0
+  turnSpeed: 5
+  stationaryTurnSpeedMlp: 1
+  airSpeed: 6
+  airControl: 2
+  jumpPower: 12
+  jumpRepeatDelayTime: 0
+  wallRunLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  wallRunMaxLength: 1
+  wallRunMinMoveMag: 0.6
+  wallRunMinVelocityY: -1
+  wallRunRotationSpeed: 1.5
+  wallRunMaxRotationAngle: 70
+  wallRunWeightSpeed: 5
+  crouchCapsuleScaleMlp: 0.6
+  maxSprintStamina: 10
+  _hitbox: {fileID: 0}
+  _hitboxController: {fileID: 0}
+  hitboxProfile: []
 --- !u!1 &1380685713
 GameObject:
   m_ObjectHideFlags: 0

@@ -73,9 +73,11 @@ namespace RingEternal.MyThirdPersonController
         // When the Animator moves
         public virtual void Move(Vector3 deltaPosition, Quaternion deltaRotation)
         {
-            // Accumulate delta position, update in FixedUpdate to maintain consitency
+            // Accumulate delta position, update in FixedUpdate to maintain consistency
             blackboard.fixedDeltaPosition += deltaPosition;
             blackboard.fixedDeltaRotation *= deltaRotation;
+
+            blackboard.deltaPosition = deltaPosition;
         }
 
 
@@ -100,13 +102,11 @@ namespace RingEternal.MyThirdPersonController
             if (blackboard.actionSlot != null && fullBodyInfo.IsName("ResetState")) // we need to be in the empty state in order to transition
             {
                 targetAnim = blackboard.actionSlot.targetAnim;
-                Debug.Log("Play target animation: " + targetAnim);
                 blackboard.animator.Play(targetAnim);
             }
 
             else if (blackboard.actionSlot == null && fullBodyInfo.IsName("ResetState"))
             {
-                Debug.Log("Cannot attack if action slots are null");
                 blackboard.canAttack = false;
                 blackboard.doOnce = false;
             }
@@ -168,8 +168,6 @@ namespace RingEternal.MyThirdPersonController
             angle = Mathf.Clamp(angle / Time.deltaTime, -1f, 1f);
             // Update Animator params
             blackboard.animator.SetFloat("Turn", Mathf.Lerp(blackboard.animator.GetFloat("Turn"), angle, Time.deltaTime * turnSpeed));
-            blackboard.animator.SetFloat("InputVertical", blackboard.animState.moveDirection.z);
-            blackboard.animator.SetFloat("InputHorizontal", blackboard.animState.moveDirection.x);
             blackboard.animator.SetBool("OnGround", blackboard.animState.onGround);
             blackboard.animator.SetBool("IsStrafing", blackboard.animState.isStrafing);
             blackboard.animator.SetFloat("MovementMagnitude", (Mathf.Abs(blackboard.animState.moveDirection.z) + Mathf.Abs(blackboard.animState.moveDirection.x)));
@@ -218,7 +216,7 @@ namespace RingEternal.MyThirdPersonController
         public void CannotAttack()
         {
 
-            Debug.Log("Closing can attack");
+            //Debug.Log("Closing can attack");
             blackboard.canAttack = false;
         }
         protected virtual void Update()
