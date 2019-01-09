@@ -60,8 +60,6 @@ public class PlayerBlackboard : MonoBehaviour, IBlackboard
 
     public Transform lookPos { get; set; }
     public bool lookInCameraDirection { get; set; }
-    public Vector3 fixedDeltaPosition { get; set; }
-    public Quaternion fixedDeltaRotation { get; set; } = Quaternion.identity;
 
     bool shouldAttack;
     public Quaternion targetRotation { get; set; }

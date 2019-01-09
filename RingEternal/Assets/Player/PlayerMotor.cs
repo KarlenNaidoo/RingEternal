@@ -240,10 +240,8 @@ namespace RingEternal.MyThirdPersonController
 
             // Dampering forward speed on the slopes
             float slopeDamper = !onGround ? 1f : GetSlopeDamper(-_blackboard.deltaPosition / Time.deltaTime, normal);
-            Debug.Log("delta position " + _blackboard.deltaPosition);
             forwardMlp = Mathf.Lerp(forwardMlp, slopeDamper, Time.deltaTime * 5f);
 
-            Debug.Log("forwardMlp " + forwardMlp);
         }
 
         // Processing horizontal wall running

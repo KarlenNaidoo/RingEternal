@@ -125,11 +125,6 @@ namespace RingEternal.MyCharacter
             float angle = 90f - Vector3.Angle(velocity, groundNormal);
             angle -= slopeStartAngle;
             float range = slopeEndAngle - slopeStartAngle;
-            Debug.Log("Velocity: " + velocity);
-            Debug.Log("Ground Normal: " + groundNormal);
-            Debug.Log("Angle: " + angle);
-            Debug.Log("Range: " + range);
-            Debug.Log("Result: " + (1f - Mathf.Clamp(angle / range, 0f, 1f)));
             return 1f - Mathf.Clamp(angle / range, 0f, 1f);
         }
     }
