@@ -170,7 +170,6 @@ namespace RingEternal.MyThirdPersonController
             // Fill in animState
             _animState.onGround = onGround;
             _animState.moveDirection = GetMoveDirection();
-            Debug.Log("ANIM MOVE DIRECTION IS " + _animState.moveDirection);
             _animState.yVelocity = Mathf.Lerp(_blackboard.animState.yVelocity, velocityY, Time.deltaTime * 10f);
             _animState.crouch = _playerInput.state.crouch;
             _animState.isStrafing = moveMode == MoveMode.Strafe;

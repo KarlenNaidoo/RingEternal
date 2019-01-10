@@ -89,9 +89,15 @@ namespace RingEternal.MyThirdPersonController
 
             LayerControl();
             EquipWeapon();
-            
 
-            float angle = CalculateAngularDelta();
+
+            // Calculate the angular delta in character rotation
+            float angle = -GetAngleFromForward(lastForward) - deltaAngle;
+            deltaAngle = 0f;
+            lastForward = transform.forward;
+            angle *= turnSensitivity * 0.01f;
+            angle = Mathf.Clamp(angle / Time.deltaTime, -1f, 1f);
+            Debug.Log("Angle " + Mathf.Clamp(angle / Time.deltaTime, -1, 1));
 
             UpdateAnimatorParams(angle);
             PlayTargetAnimation();
@@ -113,7 +119,7 @@ namespace RingEternal.MyThirdPersonController
 
             // Update Animator params
             blackboard.animator.SetFloat("Turn", Mathf.Lerp(blackboard.animator.GetFloat("Turn"), angle, Time.deltaTime * turnSpeed));
-            blackboard.animator.SetFloat("Forward", blackboard.animState.moveDirection.z);
+            blackboard.animator.SetFloat("Forward", Mathf.Clamp(blackboard.animState.moveDirection.z,-1f,1f));
             blackboard.animator.SetFloat("Right", blackboard.animState.moveDirection.x);
             blackboard.animator.SetBool("Crouch", blackboard.animState.crouch);
             blackboard.animator.SetBool("OnGround", blackboard.animState.onGround);
@@ -144,6 +150,7 @@ namespace RingEternal.MyThirdPersonController
             lastForward = transform.forward;
             angle *= turnSensitivity * 0.01f;
             angle = Mathf.Clamp(angle / Time.deltaTime, -1f, 1f);
+            Debug.Log("Angle " + Mathf.Clamp(angle / Time.deltaTime, -1, 1));
             return angle;
         }
 
@@ -156,6 +163,9 @@ namespace RingEternal.MyThirdPersonController
                 parentTransform.rotation = blackboard.animator.rootRotation;
             }
 
+            // For not using root rotation in Turn value calculation 
+            Vector3 f = blackboard.animator.deltaRotation * Vector3.forward;
+            deltaAngle += Mathf.Atan2(f.x, f.z) * Mathf.Rad2Deg;
             Move(blackboard.animator.deltaPosition, blackboard.animator.deltaRotation);
         }
 
