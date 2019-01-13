@@ -81,8 +81,6 @@ namespace RingEternal.MyThirdPersonController
         {
             HandleInput();
 
-            // calculate the head look target position
-            state.lookPos = transform.position + cam.forward * 100f;
         }
 
 
@@ -112,8 +110,10 @@ namespace RingEternal.MyThirdPersonController
 
             float speedMultiplier = (blackboard.runByDefault) ? 1.5f : 1f; // Set the correct speed value to pass to animator
 
-            //state.move *= speedMultiplier;
-            
+            state.move *= speedMultiplier;
+
+            // calculate the head look target position
+            state.lookPos = transform.position + cam.forward * 100f;
         }
         
         

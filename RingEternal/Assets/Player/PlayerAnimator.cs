@@ -52,8 +52,8 @@ namespace RingEternal.MyThirdPersonController
         protected virtual void Start()
         {
 
-            lastForward = parentTransform.forward;
-            
+            lastForward = transform.forward;
+
         }
 
 
@@ -119,6 +119,7 @@ namespace RingEternal.MyThirdPersonController
 
             // Update Animator params
             blackboard.animator.SetFloat("Turn", Mathf.Lerp(blackboard.animator.GetFloat("Turn"), angle, Time.deltaTime * turnSpeed));
+
             blackboard.animator.SetFloat("Forward", Mathf.Clamp(blackboard.animState.moveDirection.z,-1f,1f));
             blackboard.animator.SetFloat("Right", blackboard.animState.moveDirection.x);
             blackboard.animator.SetBool("Crouch", blackboard.animState.crouch);
@@ -156,13 +157,11 @@ namespace RingEternal.MyThirdPersonController
 
         public void OnAnimatorMove()
         {
-
             if (blackboard.useRootMotion)
             {
                 parentTransform.position = blackboard.animator.rootPosition;
-                parentTransform.rotation = blackboard.animator.rootRotation;
             }
-
+            
             // For not using root rotation in Turn value calculation 
             Vector3 f = blackboard.animator.deltaRotation * Vector3.forward;
             deltaAngle += Mathf.Atan2(f.x, f.z) * Mathf.Rad2Deg;
