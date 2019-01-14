@@ -403,11 +403,11 @@ namespace Player
             if(Mathf.Abs(x) > 0 || Mathf.Abs(y) > 0)
             {
                 Debug.Log("Look in camera direction being called from Rotate Camera");
-                blackboard.lookInCameraDirection = true;
+                //blackboard.lookInCameraDirection = true;
             }
             else
             {
-                blackboard.lookInCameraDirection = false;
+                //blackboard.lookInCameraDirection = false;
             }
             if (currentState.cameraMode.Equals(TPCameraMode.FixedPoint)) return;
             if (!currentState.cameraMode.Equals(TPCameraMode.FixedAngle))
@@ -636,8 +636,8 @@ namespace Player
             }
             var rotation = Quaternion.LookRotation((lookPoint) - transform.position);
 
-            if (blackboard.lockOnPressed)
-                SetLockTarget(blackboard.lockTarget);
+            if (blackboard.LockOnPressed)
+                SetLockTarget(blackboard.LockTarget);
             else
                 ClearLockOnTarget();
 

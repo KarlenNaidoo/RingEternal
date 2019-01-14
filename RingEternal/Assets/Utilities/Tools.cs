@@ -165,5 +165,18 @@ namespace RingEternal.MyTools
 
             return planePosition + Vector3.Project(point - planePosition, tangent);
         }
+
+    }
+
+
+    // Animation state
+    public struct AnimState
+    {
+        public Vector3 moveDirection; // the forward speed
+        public bool jump; // should the character be jumping?
+        public bool crouch; // should the character be crouching?
+        public bool onGround; // is the character grounded
+        public bool isStrafing; // should the character always rotate to face the move direction or strafe?
+        public float yVelocity; // y velocity of the character
     }
 }

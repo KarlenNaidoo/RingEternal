@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+using RingEternal.MyTools;
 /* Actually moves the player
  * It accepts input from PlayerInput, it gets the values from the MovementController about its transitions, and how to move from the PlayerMotor
  */
@@ -15,11 +15,12 @@ namespace RingEternal.MyThirdPersonController
         [SerializeField] float turnSpeed = 5f; // Animator turning interpolation speed
         [SerializeField] float runCycleLegOffset = 0.2f; // The offset of leg positions in the running cycle
         [Range(0.1f, 3f)] [SerializeField] float animSpeedMultiplier = 1; // How much the animation of the character will be multiplied by
-        
-        private Vector3 fixedDeltaPosition;
-        private Quaternion fixedDeltaRotation = Quaternion.identity;
+        [SerializeField] bool _useRootPosition = true;
+        private AnimState _animState;
+        private Vector3 _fixedDeltaPosition;
+        private Quaternion _fixedDeltaRotation = Quaternion.identity;
 
-        protected bool animatePhysics;
+        protected bool _animatePhysics;
 
         [SerializeField] GameObject weapon;
         [SerializeField] GameObject weaponParentDestination;
@@ -34,15 +35,15 @@ namespace RingEternal.MyThirdPersonController
         [HideInInspector]
         public AnimatorStateInfo baseLayerInfo, rightArmInfo, leftArmInfo, fullBodyInfo, upperBodyInfo;
         private int baseLayer
-        { get { return blackboard.animator.GetLayerIndex("Base Layer"); } }
+        { get { return blackboard.Animator.GetLayerIndex("Base Layer"); } }
         private int rightArmLayer
-        { get { return blackboard.animator.GetLayerIndex("RightArm"); } }
+        { get { return blackboard.Animator.GetLayerIndex("RightArm"); } }
         private int leftArmLayer
-        { get { return blackboard.animator.GetLayerIndex("LeftArm"); } }
+        { get { return blackboard.Animator.GetLayerIndex("LeftArm"); } }
         private int upperBodyLayer
-        { get { return blackboard.animator.GetLayerIndex("UpperBody"); } }
+        { get { return blackboard.Animator.GetLayerIndex("UpperBody"); } }
         private int fullbodyLayer
-        { get { return blackboard.animator.GetLayerIndex("FullBody"); } }
+        { get { return blackboard.Animator.GetLayerIndex("FullBody"); } }
 
         private Vector3 lastForward;
         private const string groundedDirectional = "Grounded Directional", groundedStrafe = "Grounded Strafe";
@@ -56,19 +57,19 @@ namespace RingEternal.MyThirdPersonController
 
         }
 
-
+        
         public void LayerControl()
         {
-            baseLayerInfo = blackboard.animator.GetCurrentAnimatorStateInfo(baseLayer);
-            rightArmInfo = blackboard.animator.GetCurrentAnimatorStateInfo(rightArmLayer);
-            leftArmInfo = blackboard.animator.GetCurrentAnimatorStateInfo(leftArmLayer);
-            upperBodyInfo = blackboard.animator.GetCurrentAnimatorStateInfo(upperBodyLayer);
-            fullBodyInfo = blackboard.animator.GetCurrentAnimatorStateInfo(fullbodyLayer);
+            baseLayerInfo = blackboard.Animator.GetCurrentAnimatorStateInfo(baseLayer);
+            rightArmInfo = blackboard.Animator.GetCurrentAnimatorStateInfo(rightArmLayer);
+            leftArmInfo = blackboard.Animator.GetCurrentAnimatorStateInfo(leftArmLayer);
+            upperBodyInfo = blackboard.Animator.GetCurrentAnimatorStateInfo(upperBodyLayer);
+            fullBodyInfo = blackboard.Animator.GetCurrentAnimatorStateInfo(fullbodyLayer);
         }
 
         public Vector3 GetPivotPoint()
         {
-            return blackboard.animator.pivotPosition;
+            return blackboard.Animator.pivotPosition;
         }
 
         // Is the Animator playing the grounded animations?
@@ -76,7 +77,7 @@ namespace RingEternal.MyThirdPersonController
         {
             get
             {
-                return blackboard.animator.GetCurrentAnimatorStateInfo(0).IsName(groundedDirectional) || blackboard.animator.GetCurrentAnimatorStateInfo(0).IsName(groundedStrafe);
+                return blackboard.Animator.GetCurrentAnimatorStateInfo(0).IsName(groundedDirectional) || blackboard.Animator.GetCurrentAnimatorStateInfo(0).IsName(groundedStrafe);
             }
         }
 
@@ -106,40 +107,41 @@ namespace RingEternal.MyThirdPersonController
 
         private void UpdateAnimatorParams(float angle)
         {
-            animatePhysics = blackboard.animator.updateMode == AnimatorUpdateMode.AnimatePhysics;
+            _animatePhysics = blackboard.Animator.updateMode == AnimatorUpdateMode.AnimatePhysics;
+            _animState = blackboard.AnimState;
 
             // Jumping
-            if (blackboard.animState.jump)
+            if (_animState.jump)
             {
-                float runCycle = Mathf.Repeat(blackboard.animator.GetCurrentAnimatorStateInfo(0).normalizedTime + runCycleLegOffset, 1);
-                float jumpLeg = (runCycle < 0 ? 1 : -1) * blackboard.animState.moveDirection.z;
+                float runCycle = Mathf.Repeat(blackboard.Animator.GetCurrentAnimatorStateInfo(0).normalizedTime + runCycleLegOffset, 1);
+                float jumpLeg = (runCycle < 0 ? 1 : -1) * _animState.moveDirection.z;
 
-                blackboard.animator.SetFloat("JumpLeg", jumpLeg);
+                blackboard.Animator.SetFloat("JumpLeg", jumpLeg);
             }
 
             // Update Animator params
-            blackboard.animator.SetFloat("Turn", Mathf.Lerp(blackboard.animator.GetFloat("Turn"), angle, Time.deltaTime * turnSpeed));
+            blackboard.Animator.SetFloat("Turn", Mathf.Lerp(blackboard.Animator.GetFloat("Turn"), angle, Time.deltaTime * turnSpeed));
 
-            blackboard.animator.SetFloat("Forward", Mathf.Clamp(blackboard.animState.moveDirection.z,-1f,1f));
-            blackboard.animator.SetFloat("Right", blackboard.animState.moveDirection.x);
-            blackboard.animator.SetBool("Crouch", blackboard.animState.crouch);
-            blackboard.animator.SetBool("OnGround", blackboard.animState.onGround);
-            blackboard.animator.SetBool("IsStrafing", blackboard.animState.isStrafing);
+            blackboard.Animator.SetFloat("Forward", Mathf.Clamp(_animState.moveDirection.z,-1f,1f));
+            blackboard.Animator.SetFloat("Right", _animState.moveDirection.x);
+            blackboard.Animator.SetBool("Crouch", _animState.crouch);
+            blackboard.Animator.SetBool("OnGround", _animState.onGround);
+            blackboard.Animator.SetBool("IsStrafing", _animState.isStrafing);
 
-            if (!blackboard.animState.onGround)
+            if (!_animState.onGround)
             {
-                blackboard.animator.SetFloat("Jump", blackboard.animState.yVelocity);
+                blackboard.Animator.SetFloat("Jump", _animState.yVelocity);
             }
 
             // the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector
-            if (blackboard.animState.onGround && blackboard.animState.moveDirection.z > 0f)
+            if (_animState.onGround && _animState.moveDirection.z > 0f)
             {
-                blackboard.animator.speed = animSpeedMultiplier;
+                blackboard.Animator.speed = animSpeedMultiplier;
             }
             else
             {
                 // but we don't want to use that while airborne
-                blackboard.animator.speed = 1;
+                blackboard.Animator.speed = 1;
             }
         }
 
@@ -157,15 +159,15 @@ namespace RingEternal.MyThirdPersonController
 
         public void OnAnimatorMove()
         {
-            if (blackboard.useRootMotion)
+            if (_useRootPosition)
             {
-                parentTransform.position = blackboard.animator.rootPosition;
+                parentTransform.position = blackboard.Animator.rootPosition;
             }
             
             // For not using root rotation in Turn value calculation 
-            Vector3 f = blackboard.animator.deltaRotation * Vector3.forward;
+            Vector3 f = blackboard.Animator.deltaRotation * Vector3.forward;
             deltaAngle += Mathf.Atan2(f.x, f.z) * Mathf.Rad2Deg;
-            Move(blackboard.animator.deltaPosition, blackboard.animator.deltaRotation);
+            Move(blackboard.Animator.deltaPosition, blackboard.Animator.deltaRotation);
         }
 
 
@@ -174,10 +176,10 @@ namespace RingEternal.MyThirdPersonController
         {
 
             // Accumulate delta position, update in FixedUpdate to maintain consitency
-            fixedDeltaPosition += deltaPosition;
-            fixedDeltaRotation *= deltaRotation;
+            _fixedDeltaPosition += deltaPosition;
+            _fixedDeltaRotation *= deltaRotation;
 
-            blackboard.deltaPosition = deltaPosition;
+            blackboard.DeltaPosition = deltaPosition;
         }
         
 
@@ -186,34 +188,34 @@ namespace RingEternal.MyThirdPersonController
         {
 
             string targetAnim;
-            if (blackboard.actionSlot != null && fullBodyInfo.IsName("ResetState")) // we need to be in the empty state in order to transition
+            if (blackboard.ActionSlot != null && fullBodyInfo.IsName("ResetState")) // we need to be in the empty state in order to transition
             {
-                targetAnim = blackboard.actionSlot.targetAnim;
-                blackboard.animator.Play(targetAnim);
+                targetAnim = blackboard.ActionSlot.targetAnim;
+                blackboard.Animator.Play(targetAnim);
             }
 
-            else if (blackboard.actionSlot == null && fullBodyInfo.IsName("ResetState"))
+            else if (blackboard.ActionSlot == null && fullBodyInfo.IsName("ResetState"))
             {
-                blackboard.canAttack = false;
-                blackboard.doOnce = false;
+                blackboard.CanAttack = false;
+                blackboard.DoOnce = false;
             }
         }
 
         protected void CheckForCombo()
         {
-            if (blackboard.canAttack)
+            if (blackboard.CanAttack)
             {
                 ControllerActionInput a_input = controllerActionManager.GetActionInput();
-                if (a_input == ControllerActionInput.Square && !blackboard.doOnce)
+                if (a_input == ControllerActionInput.Square && !blackboard.DoOnce)
                 {
-                    blackboard.animator.SetTrigger("LightAttack");
-                    blackboard.doOnce = true;
+                    blackboard.Animator.SetTrigger("LightAttack");
+                    blackboard.DoOnce = true;
                     return;
                 }
-                if (a_input == ControllerActionInput.Triangle && !blackboard.doOnce)
+                if (a_input == ControllerActionInput.Triangle && !blackboard.DoOnce)
                 {
-                    blackboard.animator.SetTrigger("HeavyAttack");
-                    blackboard.doOnce = true;
+                    blackboard.Animator.SetTrigger("HeavyAttack");
+                    blackboard.DoOnce = true;
                     return;
                 }
             }
@@ -224,28 +226,28 @@ namespace RingEternal.MyThirdPersonController
 
         private void EquipWeapon()
         {
-            if (blackboard.currentWeapon == WeaponStatus.OneHanded && !blackboard.weaponEquipped)
+            if (blackboard.CurrentWeapon == WeaponStatus.OneHanded && !blackboard.WeaponEquipped)
             {
-                blackboard.animator.CrossFade("Sword1h_Equip", 0.4f);
-                blackboard.weaponEquipped = true;
+                blackboard.Animator.CrossFade("Sword1h_Equip", 0.4f);
+                blackboard.WeaponEquipped = true;
                 weapon.transform.parent = weaponParentDestination.transform;
                 weapon.transform.localRotation = Quaternion.identity;
                 weapon.transform.localPosition = Vector3.zero;
             }
                 
-            blackboard.animator.SetFloat("IsTwoHanded", Mathf.Lerp(blackboard.animator.GetFloat("IsTwoHanded"), (float)blackboard.currentWeapon, Time.deltaTime));
+            blackboard.Animator.SetFloat("IsTwoHanded", Mathf.Lerp(blackboard.Animator.GetFloat("IsTwoHanded"), (float)blackboard.CurrentWeapon, Time.deltaTime));
         }
         
         public virtual void PlayHurtAnimation(bool value)
         {
-            blackboard.animator.Play("Idle_Hit_Strong_Right");
+            blackboard.Animator.Play("Idle_Hit_Strong_Right");
         }
 
 
         public virtual void Crouch()
         {
 
-            blackboard.isCrouching = true;
+            blackboard.IsCrouching = true;
 
         }
 
@@ -259,8 +261,8 @@ namespace RingEternal.MyThirdPersonController
         // This function is called from an Animation Event
         public void CanAttack()
         {
-            blackboard.canAttack = true;
-            blackboard.doOnce = false;
+            blackboard.CanAttack = true;
+            blackboard.DoOnce = false;
         }
 
 
@@ -269,10 +271,12 @@ namespace RingEternal.MyThirdPersonController
         {
 
             //Debug.Log("Closing can attack");
-            blackboard.canAttack = false;
+            blackboard.CanAttack = false;
         }
 
 
     }
-    
+
+
+   
 }

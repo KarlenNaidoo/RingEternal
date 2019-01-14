@@ -69,7 +69,6 @@ namespace RingEternal.MyThirdPersonController
         protected Vector3 moveDirection; // The current move direction of the character in Strafe move mode
 
         private Animator animator;
-        private PlayerBlackboard.AnimState _animState;
         private Vector3 normal, platformVelocity, platformAngularVelocity;
         private RaycastHit hit;
         private float jumpLeg, jumpEndTime, forwardMlp, groundDistance, lastAirTime, stickyForce;
@@ -85,6 +84,7 @@ namespace RingEternal.MyThirdPersonController
         private Vector3 verticalVelocity;
         private float velocityY;
         private bool onGround;
+        private AnimState _animState;
 
         // Use this for initialization
         protected override void Start()
@@ -92,23 +92,10 @@ namespace RingEternal.MyThirdPersonController
             base.Start();
             wallNormal = -gravity.normalized;
             onGround = true;
-            _animState = new PlayerBlackboard.AnimState();
-            _blackboard.runByDefault = runByDefault;
+            _animState = new AnimState();
+            _blackboard.RunByDefault = runByDefault;
             if (_cam != null) _cam.enabled = false;
         }
-
-        //void OnAnimatorMove() // TODO: Move this to PlayAnimator script
-        //{
-        //    Move(_blackboard.animator.deltaPosition, _blackboard.animator.deltaRotation);
-        //}
-
-        //// When the Animator moves
-        //public override void Move(Vector3 deltaPosition, Quaternion deltaRotation)
-        //{
-        //    // Accumulate delta position, update in FixedUpdate to maintain consitency
-        //    fixedDeltaPosition += deltaPosition;
-        //    fixedDeltaRotation *= deltaRotation;
-        //}
 
         void FixedUpdate()
         {
@@ -120,7 +107,7 @@ namespace RingEternal.MyThirdPersonController
 
             // Smoothing out the fixed time step
             rb.interpolation = smoothPhysics ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
-            _blackboard.smoothFollow = smoothPhysics;
+            _blackboard.SmoothFollow = smoothPhysics;
 
             // Move
             MoveFixed(fixedDeltaPosition);
@@ -171,10 +158,10 @@ namespace RingEternal.MyThirdPersonController
             // Fill in animState
             _animState.onGround = onGround;
             _animState.moveDirection = GetMoveDirection();
-            _animState.yVelocity = Mathf.Lerp(_blackboard.animState.yVelocity, velocityY, Time.deltaTime * 10f);
+            _animState.yVelocity = Mathf.Lerp(_animState.yVelocity, velocityY, Time.deltaTime * 10f);
             _animState.crouch = _playerInput.state.crouch;
             _animState.isStrafing = moveMode == MoveMode.Strafe;
-            _blackboard.animState = _animState;
+            _blackboard.AnimState = _animState;
 
         }
 
@@ -239,7 +226,7 @@ namespace RingEternal.MyThirdPersonController
             rb.velocity = horizontalVelocity + verticalVelocity;
 
             // Dampering forward speed on the slopes
-            float slopeDamper = !onGround ? 1f : GetSlopeDamper(-_blackboard.deltaPosition / Time.deltaTime, normal);
+            float slopeDamper = !onGround ? 1f : GetSlopeDamper(-_blackboard.DeltaPosition / Time.deltaTime, normal);
             forwardMlp = Mathf.Lerp(forwardMlp, slopeDamper, Time.deltaTime * 5f);
 
         }

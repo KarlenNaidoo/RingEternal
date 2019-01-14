@@ -108,7 +108,7 @@ namespace RingEternal.MyThirdPersonController
             }
             else state.move = Vector3.zero;
 
-            float speedMultiplier = (blackboard.runByDefault) ? 1.5f : 1f; // Set the correct speed value to pass to animator
+            float speedMultiplier = (blackboard.RunByDefault) ? 1.5f : 1f; // Set the correct speed value to pass to animator
 
             state.move *= speedMultiplier;
 
@@ -121,13 +121,13 @@ namespace RingEternal.MyThirdPersonController
         {
             if (playerActions.Sprint.IsPressed)
             {
-                blackboard.isSprinting = true;
-                DecreaseSprintStamina(blackboard.currentSprintStamina);
+                blackboard.IsSprinting = true;
+                DecreaseSprintStamina(blackboard.CurrentSprintStamina);
             }
             else
             {
-                blackboard.isSprinting = false;
-                IncreaseSprintStamina(blackboard.currentSprintStamina);
+                blackboard.IsSprinting = false;
+                IncreaseSprintStamina(blackboard.CurrentSprintStamina);
             }
         }
 
@@ -138,17 +138,17 @@ namespace RingEternal.MyThirdPersonController
             {
                 currentSprintStamina = 0;
             }
-            blackboard.currentSprintStamina = currentSprintStamina;
+            blackboard.CurrentSprintStamina = currentSprintStamina;
         }
 
         protected virtual void IncreaseSprintStamina(float currentSprintStamina)
         {
             currentSprintStamina += Time.deltaTime;
-            if(currentSprintStamina >= blackboard.maxSprintStamina)
+            if(currentSprintStamina >= blackboard.MaxSprintStamina)
             {
-                currentSprintStamina = blackboard.maxSprintStamina;
+                currentSprintStamina = blackboard.MaxSprintStamina;
             }
-            blackboard.currentSprintStamina = currentSprintStamina;
+            blackboard.CurrentSprintStamina = currentSprintStamina;
         }
         
 
