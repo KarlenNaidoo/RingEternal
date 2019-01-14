@@ -37,6 +37,7 @@ namespace RingEternal.MyThirdPersonController
         public float groundStickyEffect = 4f;               // power of 'stick to ground' effect - prevents bumping down slopes.
         public float maxVerticalVelocityOnGround = 3f;      // the maximum y velocity while the character is grounded
         public float velocityToGroundTangentWeight = 0f;    // the weight of rotating character velocity vector to the ground tangent
+        public bool runByDefault = true;
 
         [Header("Rotation")]
         public bool lookInCameraDirection; // should the character be looking in the same direction that the camera is facing
@@ -92,7 +93,7 @@ namespace RingEternal.MyThirdPersonController
             wallNormal = -gravity.normalized;
             onGround = true;
             _animState = new PlayerBlackboard.AnimState();
-          
+            _blackboard.runByDefault = runByDefault;
             if (_cam != null) _cam.enabled = false;
         }
 

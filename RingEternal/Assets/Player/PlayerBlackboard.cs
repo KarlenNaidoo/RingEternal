@@ -18,7 +18,7 @@ public class PlayerBlackboard : MonoBehaviour, IBlackboard
     public float inputY { set { _inputY = value; } }
     public Vector2 input { get; private set; }
     public Vector2 oldInput { get; set; }
-    public bool runByDefault;
+    public bool runByDefault { get; set; }
     public void SetPlayerInputParameters(float x, float y)
     {
         input = new Vector2(x, y);
