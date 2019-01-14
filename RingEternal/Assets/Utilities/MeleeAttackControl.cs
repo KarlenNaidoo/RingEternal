@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Player.Utility;
+using RingEternal.MyCharacter;
 
 public class MeleeAttackControl : StateMachineBehaviour {
 

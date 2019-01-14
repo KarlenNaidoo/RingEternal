@@ -259,15 +259,3 @@ public enum HitBoxArea { LeftArm, RightArm, BothArms, LeftLeg, RightLeg, BothLeg
 public enum ColliderState { Closed, Open, Colliding }
 
 
-// Animation state
-public struct AnimState
-{
-    public Vector3 moveDirection; // the forward speed
-    public bool crouch; // should the character be crouching?
-    public bool onGround; // is the character grounded
-    public bool isStrafing; // should the character always rotate to face the move direction or strafe?
-    public float yVelocity; // y velocity of the character
-    public float vertical;
-    public float horizontal;
-}
-

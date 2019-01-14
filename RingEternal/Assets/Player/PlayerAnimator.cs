@@ -4,22 +4,23 @@
  * It accepts input from PlayerInput, it gets the values from the MovementController about its transitions, and how to move from the PlayerMotor
  */
 
-namespace Player.PlayerController
+namespace RingEternal.MyThirdPersonController
 {
     public class PlayerAnimator : MonoBehaviour
     {
         
-        ControllerActionManager controllerActionManager;
-        private float randomIdleCount, randomIdle;
+
 
         [SerializeField] float turnSensitivity = 0.2f; // Animator turning sensitivity
         [SerializeField] float turnSpeed = 5f; // Animator turning interpolation speed
         [SerializeField] float runCycleLegOffset = 0.2f; // The offset of leg positions in the running cycle
         [Range(0.1f, 3f)] [SerializeField] float animSpeedMultiplier = 1; // How much the animation of the character will be multiplied by
-        private Vector3 lastForward;
-        private float deltaAngle;
-
         
+        private Vector3 fixedDeltaPosition;
+        private Quaternion fixedDeltaRotation = Quaternion.identity;
+
+        protected bool animatePhysics;
+
         [SerializeField] GameObject weapon;
         [SerializeField] GameObject weaponParentDestination;
         [SerializeField] GameObject weaponParentOrigin;
@@ -27,6 +28,7 @@ namespace Player.PlayerController
         [Header("References")]
         [SerializeField] PlayerBlackboard blackboard;
         [SerializeField] Transform parentTransform;
+        [SerializeField] ControllerActionManager controllerActionManager;
 
         // get Layers from the Animator Controller
         [HideInInspector]
@@ -42,26 +44,127 @@ namespace Player.PlayerController
         private int fullbodyLayer
         { get { return blackboard.animator.GetLayerIndex("FullBody"); } }
 
-        protected virtual void Awake()
-        {
-            controllerActionManager = blackboard.controllerActionManager;
-        }
+        private Vector3 lastForward;
+        private const string groundedDirectional = "Grounded Directional", groundedStrafe = "Grounded Strafe";
+        private float deltaAngle;
+
 
         protected virtual void Start()
         {
 
-            lastForward = parentTransform.forward;
+            lastForward = transform.forward;
+
+        }
+
+
+        public void LayerControl()
+        {
+            baseLayerInfo = blackboard.animator.GetCurrentAnimatorStateInfo(baseLayer);
+            rightArmInfo = blackboard.animator.GetCurrentAnimatorStateInfo(rightArmLayer);
+            leftArmInfo = blackboard.animator.GetCurrentAnimatorStateInfo(leftArmLayer);
+            upperBodyInfo = blackboard.animator.GetCurrentAnimatorStateInfo(upperBodyLayer);
+            fullBodyInfo = blackboard.animator.GetCurrentAnimatorStateInfo(fullbodyLayer);
+        }
+
+        public Vector3 GetPivotPoint()
+        {
+            return blackboard.animator.pivotPosition;
+        }
+
+        // Is the Animator playing the grounded animations?
+        public bool animationGrounded
+        {
+            get
+            {
+                return blackboard.animator.GetCurrentAnimatorStateInfo(0).IsName(groundedDirectional) || blackboard.animator.GetCurrentAnimatorStateInfo(0).IsName(groundedStrafe);
+            }
+        }
+
+
+        // Update the Animator with the current state of the character controller
+        protected virtual void Update()
+        {
+            if (Time.deltaTime == 0f) return;
+
+
+            LayerControl();
+            EquipWeapon();
+
+
+            // Calculate the angular delta in character rotation
+            float angle = -GetAngleFromForward(lastForward) - deltaAngle;
+            deltaAngle = 0f;
+            lastForward = transform.forward;
+            angle *= turnSensitivity * 0.01f;
+            angle = Mathf.Clamp(angle / Time.deltaTime, -1f, 1f);
+            Debug.Log("Angle " + Mathf.Clamp(angle / Time.deltaTime, -1, 1));
+
+            UpdateAnimatorParams(angle);
+            PlayTargetAnimation();
+            CheckForCombo();
+        }
+
+        private void UpdateAnimatorParams(float angle)
+        {
+            animatePhysics = blackboard.animator.updateMode == AnimatorUpdateMode.AnimatePhysics;
+
+            // Jumping
+            if (blackboard.animState.jump)
+            {
+                float runCycle = Mathf.Repeat(blackboard.animator.GetCurrentAnimatorStateInfo(0).normalizedTime + runCycleLegOffset, 1);
+                float jumpLeg = (runCycle < 0 ? 1 : -1) * blackboard.animState.moveDirection.z;
+
+                blackboard.animator.SetFloat("JumpLeg", jumpLeg);
+            }
+
+            // Update Animator params
+            blackboard.animator.SetFloat("Turn", Mathf.Lerp(blackboard.animator.GetFloat("Turn"), angle, Time.deltaTime * turnSpeed));
+
+            blackboard.animator.SetFloat("Forward", Mathf.Clamp(blackboard.animState.moveDirection.z,-1f,1f));
+            blackboard.animator.SetFloat("Right", blackboard.animState.moveDirection.x);
+            blackboard.animator.SetBool("Crouch", blackboard.animState.crouch);
+            blackboard.animator.SetBool("OnGround", blackboard.animState.onGround);
+            blackboard.animator.SetBool("IsStrafing", blackboard.animState.isStrafing);
+
+            if (!blackboard.animState.onGround)
+            {
+                blackboard.animator.SetFloat("Jump", blackboard.animState.yVelocity);
+            }
+
+            // the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector
+            if (blackboard.animState.onGround && blackboard.animState.moveDirection.z > 0f)
+            {
+                blackboard.animator.speed = animSpeedMultiplier;
+            }
+            else
+            {
+                // but we don't want to use that while airborne
+                blackboard.animator.speed = 1;
+            }
+        }
+
+        private float CalculateAngularDelta()
+        {
+            // Calculate the angular delta in character rotation
+            float angle = -GetAngleFromForward(lastForward) - deltaAngle;
+            deltaAngle = 0f;
+            lastForward = transform.forward;
+            angle *= turnSensitivity * 0.01f;
+            angle = Mathf.Clamp(angle / Time.deltaTime, -1f, 1f);
+            Debug.Log("Angle " + Mathf.Clamp(angle / Time.deltaTime, -1, 1));
+            return angle;
         }
 
         public void OnAnimatorMove()
         {
-
             if (blackboard.useRootMotion)
             {
                 parentTransform.position = blackboard.animator.rootPosition;
-                parentTransform.rotation = blackboard.animator.rootRotation;
             }
-
+            
+            // For not using root rotation in Turn value calculation 
+            Vector3 f = blackboard.animator.deltaRotation * Vector3.forward;
+            deltaAngle += Mathf.Atan2(f.x, f.z) * Mathf.Rad2Deg;
             Move(blackboard.animator.deltaPosition, blackboard.animator.deltaRotation);
         }
 
@@ -69,26 +172,16 @@ namespace Player.PlayerController
         // When the Animator moves
         public virtual void Move(Vector3 deltaPosition, Quaternion deltaRotation)
         {
+
             // Accumulate delta position, update in FixedUpdate to maintain consitency
-            blackboard.fixedDeltaPosition += deltaPosition;
-            blackboard.fixedDeltaRotation *= deltaRotation;
+            fixedDeltaPosition += deltaPosition;
+            fixedDeltaRotation *= deltaRotation;
+
+            blackboard.deltaPosition = deltaPosition;
         }
+        
 
-
-        public virtual void UpdateAnimator()
-        {
-            if (blackboard.animator == null)
-            {
-                Debug.Log("Animator is null in blackboard. Please check");
-                return;
-            }
-            LayerControl();
-            EquipWeapon();
-            LocomotionAnimation();
-            PlayTargetAnimation();
-            CheckForCombo();
-        }
-
+        #region Combat Animations
         protected virtual void PlayTargetAnimation()
         {
 
@@ -96,13 +189,11 @@ namespace Player.PlayerController
             if (blackboard.actionSlot != null && fullBodyInfo.IsName("ResetState")) // we need to be in the empty state in order to transition
             {
                 targetAnim = blackboard.actionSlot.targetAnim;
-                Debug.Log("Play target animation: " + targetAnim);
                 blackboard.animator.Play(targetAnim);
             }
 
             else if (blackboard.actionSlot == null && fullBodyInfo.IsName("ResetState"))
             {
-                Debug.Log("Cannot attack if action slots are null");
                 blackboard.canAttack = false;
                 blackboard.doOnce = false;
             }
@@ -128,15 +219,8 @@ namespace Player.PlayerController
             }
 
         }
+        #endregion
 
-        public void LayerControl()
-        {
-            baseLayerInfo = blackboard.animator.GetCurrentAnimatorStateInfo(baseLayer);
-            rightArmInfo = blackboard.animator.GetCurrentAnimatorStateInfo(rightArmLayer);
-            leftArmInfo = blackboard.animator.GetCurrentAnimatorStateInfo(leftArmLayer);
-            upperBodyInfo = blackboard.animator.GetCurrentAnimatorStateInfo(upperBodyLayer);
-            fullBodyInfo = blackboard.animator.GetCurrentAnimatorStateInfo(fullbodyLayer);
-        }
 
         private void EquipWeapon()
         {
@@ -151,37 +235,7 @@ namespace Player.PlayerController
                 
             blackboard.animator.SetFloat("IsTwoHanded", Mathf.Lerp(blackboard.animator.GetFloat("IsTwoHanded"), (float)blackboard.currentWeapon, Time.deltaTime));
         }
-
-        public void LocomotionAnimation()
-        {
-
-
-            // Calculate the angular delta in character rotation
-            float angle = -GetAngleFromForward(lastForward) - deltaAngle;
-            deltaAngle = 0f;
-            lastForward = parentTransform.forward;
-            angle *= turnSensitivity * 0.01f;
-            angle = Mathf.Clamp(angle / Time.deltaTime, -1f, 1f);
-            // Update Animator params
-            blackboard.animator.SetFloat("Turn", Mathf.Lerp(blackboard.animator.GetFloat("Turn"), angle, Time.deltaTime * turnSpeed));
-            blackboard.animator.SetFloat("InputVertical", blackboard.animState.vertical);
-            blackboard.animator.SetFloat("InputHorizontal", blackboard.animState.horizontal);
-            blackboard.animator.SetBool("OnGround", blackboard.animState.onGround);
-            blackboard.animator.SetBool("IsStrafing", blackboard.animState.isStrafing);
-            blackboard.animator.SetFloat("MovementMagnitude", (Mathf.Abs(blackboard.animState.vertical) + Mathf.Abs(blackboard.animState.horizontal)));
-            if (blackboard.isSprinting && blackboard.currentSprintStamina > 0)
-            {
-                blackboard.speed = PlayerBlackboard.SPRINT_SPEED;
-            }
-            if (blackboard.currentSprintStamina <= 0 && blackboard.isSprinting)
-            {
-                blackboard.speed = PlayerBlackboard.RUN_SPEED;
-            }
-            blackboard.animator.SetFloat("Speed", blackboard.speed, .2f, Time.deltaTime);
-
-        }
-
-
+        
         public virtual void PlayHurtAnimation(bool value)
         {
             blackboard.animator.Play("Idle_Hit_Strong_Right");
@@ -214,13 +268,10 @@ namespace Player.PlayerController
         public void CannotAttack()
         {
 
-            Debug.Log("Closing can attack");
+            //Debug.Log("Closing can attack");
             blackboard.canAttack = false;
         }
-        protected virtual void Update()
-        {
-            UpdateAnimator();
-        }
+
 
     }
     

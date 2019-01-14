@@ -1,15 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Player.PlayerController;
 using static Player.Utility;
 using System.Collections.Generic;
 using System;
+using RingEternal.MyThirdPersonController;
+using RingEternal.MyCamera;
+using RingEternal.MyCharacter;
 
 public class PlayerBlackboard : MonoBehaviour, IBlackboard
 {
     InventoryManager _inventoryManager;
     ControllerActionManager _actionManager;
     PlayerMotor _motor;
+    CameraController cam { get; set; } // If assigned, will only update the camera in LateUpdate only if character moves
     float _inputY;
     public float inputX { get; set; }
     public float inputY { set { _inputY = value; } }
@@ -56,10 +59,7 @@ public class PlayerBlackboard : MonoBehaviour, IBlackboard
     public float speed { get; set; }
 
     public Transform lookPos { get; set; }
-    public AnimState animState { get; set; }
     public bool lookInCameraDirection { get; set; }
-    public Vector3 fixedDeltaPosition { get; set; }
-    public Quaternion fixedDeltaRotation { get; set; } = Quaternion.identity;
 
     bool shouldAttack;
     public Quaternion targetRotation { get; set; }
@@ -78,27 +78,38 @@ public class PlayerBlackboard : MonoBehaviour, IBlackboard
     public bool lockOnPressed { get { return _lockOnPressed; } set { _lockOnPressed = !_lockOnPressed; } }
 
 
+    // New
+    public bool smoothFollow { get; set; }
+    public AnimState animState { get; set; }
+    public Vector3 deltaPosition {get; set; }
+
+    // Animation state
+    public struct AnimState
+    {
+        public Vector3 moveDirection; // the forward speed
+        public bool jump; // should the character be jumping?
+        public bool crouch; // should the character be crouching?
+        public bool onGround; // is the character grounded
+        public bool isStrafing; // should the character always rotate to face the move direction or strafe?
+        public float yVelocity; // y velocity of the character
+    }
+    
     //TODO: Create singleton pattern
     private void Awake()
     {
         _actionManager = GetComponent<ControllerActionManager>();
         _motor = GetComponent<PlayerMotor>();
         _inventoryManager = GetComponent<InventoryManager>();
+        animState = new AnimState();
+        smoothFollow = true;
+
     }
+
     
+
     public void SetAttackParameters(bool shouldAttack)
     {
         this.shouldAttack = shouldAttack;
     }
 
-    public void RotateToTarget(Transform lockTarget)
-    {
-        _motor.RotateToTarget(lockTarget);
-    }
-
-    public void RotateWithAnotherTransform(Transform cameraTransform)
-    {
-        _motor.RotateWithAnotherTransform(cameraTransform);
-        Debug.Log("Using method within blackboard");
-    }
 }

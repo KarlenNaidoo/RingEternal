@@ -1,59 +1,63 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using static Player.Utility;
-using Player.PlayerController;
+using RingEternal.MyCharacter;
 
-public class PlayerHitboxController : HitboxControllerBase
+namespace RingEternal.MyThirdPersonController
 {
-    [Header("References")]
-    [SerializeField] StateManager stateManager;
 
-    protected override void Awake()
+    public class PlayerHitboxController : HitboxControllerBase
     {
-        base.Awake();
-    }
+        [Header("References")]
+        [SerializeField] StateManager stateManager;
 
-
-    protected override List<HitBox> GetActiveHitboxComponents()
-    {
-        List<HitBox> activeHitboxes = new List<HitBox>();
-        if (_blackboard.hitboxes != null)
+        protected override void Awake()
         {
+            base.Awake();
+        }
 
-            for (int i = 0; i < _blackboard.hitboxes.Count; i++)
+
+        protected override List<HitBox> GetActiveHitboxComponents()
+        {
+            List<HitBox> activeHitboxes = new List<HitBox>();
+            if (_blackboard.hitboxes != null)
             {
-                for (int j = 0; j < stateManager.hitboxProfile.Length; j++)
+
+                for (int i = 0; i < _blackboard.hitboxes.Count; i++)
                 {
-                    if (stateManager.hitboxProfile[j].hitboxArea == _blackboard.hitboxes[i])
+                    for (int j = 0; j < stateManager.hitboxProfile.Length; j++)
                     {
-                        activeHitboxes.Add(stateManager.hitboxProfile[j].hitBox.GetComponent<HitBox>());
+                        if (stateManager.hitboxProfile[j].hitboxArea == _blackboard.hitboxes[i])
+                        {
+                            activeHitboxes.Add(stateManager.hitboxProfile[j].hitBox.GetComponent<HitBox>());
+                        }
                     }
                 }
             }
+            return activeHitboxes;
         }
-        return activeHitboxes;
-    }
 
 
-    protected override List<Collider> GetActiveHitboxTriggers()
-    {
-        List<Collider> activeHitboxTriggers = new List<Collider>();
-        if (_blackboard.hitboxes != null && _blackboard.hitboxes.Count > 0)
+        protected override List<Collider> GetActiveHitboxTriggers()
         {
-            for (int i = 0; i < _blackboard.hitboxes.Count; i++)
+            List<Collider> activeHitboxTriggers = new List<Collider>();
+            if (_blackboard.hitboxes != null && _blackboard.hitboxes.Count > 0)
             {
-                for (int j = 0; j < stateManager.hitboxProfile.Length; j++)
+                for (int i = 0; i < _blackboard.hitboxes.Count; i++)
                 {
-                    if (stateManager.hitboxProfile[j].hitboxArea == _blackboard.hitboxes[i])
+                    for (int j = 0; j < stateManager.hitboxProfile.Length; j++)
                     {
-                        activeHitboxTriggers.Add(stateManager.hitboxProfile[j].hitBox);
+                        if (stateManager.hitboxProfile[j].hitboxArea == _blackboard.hitboxes[i])
+                        {
+                            activeHitboxTriggers.Add(stateManager.hitboxProfile[j].hitBox);
+                        }
                     }
                 }
             }
+            return activeHitboxTriggers;
         }
-        return activeHitboxTriggers;
-    }
 
+
+    }
 
 }
