@@ -3,8 +3,6 @@ using System.Collections;
 using static Player.Utility;
 using System.Collections.Generic;
 using System;
-using RingEternal.MyThirdPersonController;
-using RingEternal.MyCamera;
 using RingEternal.MyCharacter;
 using RingEternal.MyTools;
 
@@ -25,12 +23,11 @@ public class PlayerBlackboard : MonoBehaviour, IBlackboard
     public bool WeaponEquipped { get; set; } = false;
     public bool DoOnce { get; set; }
     public bool CanAttack { get; set; }
-
+    public float Angle { get; set; }
     bool _shouldAttack;
 
     public const int SPRINT_SPEED = 3;
     public const int RUN_SPEED = 2;
-    public bool IsCrouching { get; set; }
     public bool IsSprinting { get; set; }
     public float MaxSprintStamina { get; set; }
     public float CurrentSprintStamina { get; set; }
@@ -47,8 +44,6 @@ public class PlayerBlackboard : MonoBehaviour, IBlackboard
 
     
     public bool SmoothFollow { get; set; }
-
-    public Vector3 DeltaPosition { get; set; }
 
     
     //TODO: Create singleton pattern

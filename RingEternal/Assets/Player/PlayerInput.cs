@@ -89,7 +89,6 @@ namespace RingEternal.MyThirdPersonController
         {
             StoreMovement();
             CheckForSprint();
-            //CheckForCrouch();
         }
 
         protected virtual void StoreMovement()

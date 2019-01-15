@@ -9,7 +9,6 @@ namespace RingEternal.MyCharacter
     public interface IBlackboard
     {
         Animator Animator { get; }
-        bool IsCrouching { get; set; }
         List<HitBoxArea> hitboxes { get; set; }
         List<HitBox> activeHitboxComponents { get; set; }
         void SetAttackParameters(bool shouldAttack);

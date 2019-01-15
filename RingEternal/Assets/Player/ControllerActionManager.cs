@@ -83,6 +83,20 @@ public class ControllerActionManager : PlayerInput
         return GetAction(a_input);
     }
 
+
+    WeaponAction GetAction(ControllerActionInput input)
+    {
+        for (int i = 0; i < actionSlots.Count; i++)
+        {
+            if (actionSlots[i].inputButton == input)
+            {
+                return actionSlots[i];
+            }
+        }
+
+        return null;
+    }
+
     public ControllerActionInput GetActionInput ()
     {
         if (playerActions.LightAttack.WasPressed)
@@ -119,18 +133,6 @@ public class ControllerActionManager : PlayerInput
         blackboard.Speed = 3;
     }
 
-    WeaponAction GetAction(ControllerActionInput input)
-    {
-        for (int i = 0; i < actionSlots.Count; i++)
-        {
-            if (actionSlots[i].inputButton == input)
-            {
-                return actionSlots[i];
-            }
-        }
-
-        return null;
-    }
 }
 
 
@@ -139,6 +141,9 @@ public class WeaponAction
 {
     public ControllerActionInput inputButton;
     public string targetAnim;
+    public GameObject weaponPrefab;
+    public Transform weaponParentDestination;
+    public Transform weaponParentOrigin;
 }
 
 [System.Serializable]

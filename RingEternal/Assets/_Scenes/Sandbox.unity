@@ -143,7 +143,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerRigidbody: {fileID: 1035305344}
   _animator: {fileID: 1035305347}
-  _controllerActionManager: {fileID: 885713910}
 --- !u!4 &28568783
 Transform:
   m_ObjectHideFlags: 0
@@ -302,12 +301,6 @@ MonoBehaviour:
   nativeInputOverrideUpdateRate: 0
   nativeInputUpdateRate: 0
   customProfiles: []
---- !u!1 &477586533 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1879990384944724, guid: 0ae4b4719da88c549ba648baa2c3c6a3,
-    type: 3}
-  m_PrefabInstance: {fileID: 64028305}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &670817280
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,7 +330,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2042369442}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &670817282
 MonoBehaviour:
@@ -534,7 +527,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2042369442}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &885713910
 MonoBehaviour:
@@ -554,14 +547,29 @@ MonoBehaviour:
   actionSlots:
   - inputButton: 0
     targetAnim: 
+    weaponPrefab: {fileID: 0}
+    weaponParentDestination: {fileID: 0}
+    weaponParentOrigin: {fileID: 0}
   - inputButton: 1
     targetAnim: 
+    weaponPrefab: {fileID: 0}
+    weaponParentDestination: {fileID: 0}
+    weaponParentOrigin: {fileID: 0}
   - inputButton: 2
     targetAnim: 
+    weaponPrefab: {fileID: 0}
+    weaponParentDestination: {fileID: 0}
+    weaponParentOrigin: {fileID: 0}
   - inputButton: 3
     targetAnim: 
+    weaponPrefab: {fileID: 0}
+    weaponParentDestination: {fileID: 0}
+    weaponParentOrigin: {fileID: 0}
   - inputButton: 5
     targetAnim: Slide
+    weaponPrefab: {fileID: 0}
+    weaponParentDestination: {fileID: 0}
+    weaponParentOrigin: {fileID: 0}
 --- !u!114 &885713911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -579,12 +587,21 @@ MonoBehaviour:
     oneHandedSwordActions:
     - inputButton: 0
       targetAnim: LightAtk1
+      weaponPrefab: {fileID: 0}
+      weaponParentDestination: {fileID: 0}
+      weaponParentOrigin: {fileID: 0}
     twoHandedSwordActions: []
     meleeActions:
     - inputButton: 0
       targetAnim: LightAtk1
+      weaponPrefab: {fileID: 0}
+      weaponParentDestination: {fileID: 0}
+      weaponParentOrigin: {fileID: 0}
     - inputButton: 1
       targetAnim: LightAtk1
+      weaponPrefab: {fileID: 0}
+      weaponParentDestination: {fileID: 0}
+      weaponParentOrigin: {fileID: 0}
 --- !u!1 &1035305343
 GameObject:
   m_ObjectHideFlags: 0
@@ -634,13 +651,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c6ba415e5c10104ea319234801e7a38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnSensitivity: 0.2
   turnSpeed: 5
   runCycleLegOffset: 0.2
   animSpeedMultiplier: 1
-  weapon: {fileID: 477586533}
-  weaponParentDestination: {fileID: 0}
-  weaponParentOrigin: {fileID: 0}
+  _useRootPosition: 1
   blackboard: {fileID: 28568782}
   parentTransform: {fileID: 1035305348}
   controllerActionManager: {fileID: 885713910}
@@ -727,9 +741,11 @@ MonoBehaviour:
   groundStickyEffect: 4
   maxVerticalVelocityOnGround: 3
   velocityToGroundTangentWeight: 0
+  runByDefault: 1
   lookInCameraDirection: 0
   turnSpeed: 5
   stationaryTurnSpeedMlp: 1
+  turnSensitivity: 0.2
   airSpeed: 6
   airControl: 2
   jumpPower: 12
@@ -748,36 +764,6 @@ MonoBehaviour:
   _hitbox: {fileID: 0}
   _hitboxController: {fileID: 0}
   hitboxProfile: []
---- !u!1 &1380685713
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1380685714}
-  m_Layer: 9
-  m_Name: Camera
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1380685714
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1380685713}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 2042369442}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1442177878
 GameObject:
   m_ObjectHideFlags: 0
@@ -1448,7 +1434,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 28568783}
-  - {fileID: 1380685714}
   - {fileID: 885713909}
   - {fileID: 670817281}
   m_Father: {fileID: 6666743498978451340}
