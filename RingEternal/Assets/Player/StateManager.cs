@@ -18,8 +18,8 @@ namespace RingEternal.MyThirdPersonController
         protected override void Start()
         {
             base.Start();
-            _blackboard.maxSprintStamina = maxSprintStamina;
-            _blackboard.currentSprintStamina = maxSprintStamina;
+            _blackboard.MaxSprintStamina = maxSprintStamina;
+            _blackboard.CurrentSprintStamina = maxSprintStamina;
         }
 
 
@@ -28,7 +28,7 @@ namespace RingEternal.MyThirdPersonController
 
         public void PlayHurtAnimation(bool value)
         {
-            _blackboard.animator.Play("Idle_Hit_Strong_Right");
+            _blackboard.Animator.Play("Idle_Hit_Strong_Right");
         }
 
 

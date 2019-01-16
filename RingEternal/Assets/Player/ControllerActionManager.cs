@@ -21,16 +21,16 @@ public class ControllerActionManager : PlayerInput
     protected override void HandleInput()
     {
         base.HandleInput();
-        blackboard.actionSlot = GetActionSlot();
+        blackboard.ActionSlot = GetActionSlot();
         IsOneHandedOrTwoHanded();
         MapControllerAtkActions();
     }
 
     public void MapControllerAtkActions()
     {
-        WeaponList weaponList = blackboard.weaponList;
+        WeaponList weaponList = blackboard.WeaponList;
         //Debug.Log("Current weapon status: " + blackboard.currentWeapon);
-        switch (blackboard.currentWeapon)
+        switch (blackboard.CurrentWeapon)
         {
             case WeaponStatus.OneHanded:
                 EmptyAllSlots();
@@ -83,6 +83,20 @@ public class ControllerActionManager : PlayerInput
         return GetAction(a_input);
     }
 
+
+    WeaponAction GetAction(ControllerActionInput input)
+    {
+        for (int i = 0; i < actionSlots.Count; i++)
+        {
+            if (actionSlots[i].inputButton == input)
+            {
+                return actionSlots[i];
+            }
+        }
+
+        return null;
+    }
+
     public ControllerActionInput GetActionInput ()
     {
         if (playerActions.LightAttack.WasPressed)
@@ -106,31 +120,19 @@ public class ControllerActionManager : PlayerInput
     // Monitors whether player pressed the equip left or right and updates the blackboard's currentweapon
     public void IsOneHandedOrTwoHanded()
     {
-        if (!blackboard.weaponEquipped)
-            blackboard.currentWeapon = WeaponStatus.None;
+        if (!blackboard.WeaponEquipped)
+            blackboard.CurrentWeapon = WeaponStatus.None;
         if (playerActions.OneHanded.IsPressed)
-            blackboard.currentWeapon = WeaponStatus.OneHanded;
+            blackboard.CurrentWeapon = WeaponStatus.OneHanded;
         if (playerActions.TwoHanded.IsPressed)
-            blackboard.currentWeapon = WeaponStatus.TwoHanded;
+            blackboard.CurrentWeapon = WeaponStatus.TwoHanded;
     }
 
     public void HasCrouched()
     {
-        blackboard.speed = 3;
+        blackboard.Speed = 3;
     }
 
-    WeaponAction GetAction(ControllerActionInput input)
-    {
-        for (int i = 0; i < actionSlots.Count; i++)
-        {
-            if (actionSlots[i].inputButton == input)
-            {
-                return actionSlots[i];
-            }
-        }
-
-        return null;
-    }
 }
 
 
@@ -139,6 +141,9 @@ public class WeaponAction
 {
     public ControllerActionInput inputButton;
     public string targetAnim;
+    public GameObject weaponPrefab;
+    public Transform weaponParentDestination;
+    public Transform weaponParentOrigin;
 }
 
 [System.Serializable]

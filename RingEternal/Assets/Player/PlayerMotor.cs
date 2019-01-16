@@ -27,6 +27,7 @@ namespace RingEternal.MyThirdPersonController
         [SerializeField] protected PlayerBlackboard _blackboard; // user input
         [SerializeField] protected CameraController _cam;
         [SerializeField] protected PlayerInput _playerInput; //TODO: Separate maybe
+        [SerializeField] Transform parentTransform;
 
         [Header("Movement")]
         public MoveMode moveMode; // Is the character always rotating to face the move direction or is he strafing?
@@ -38,11 +39,13 @@ namespace RingEternal.MyThirdPersonController
         public float maxVerticalVelocityOnGround = 3f;      // the maximum y velocity while the character is grounded
         public float velocityToGroundTangentWeight = 0f;    // the weight of rotating character velocity vector to the ground tangent
         public bool runByDefault = true;
+        [SerializeField] bool _useRootPosition = true;
 
         [Header("Rotation")]
         public bool lookInCameraDirection; // should the character be looking in the same direction that the camera is facing
         public float turnSpeed = 5f;                    // additional turn speed added when the player is moving (added to animation root rotation)
         public float stationaryTurnSpeedMlp = 1f;           // additional turn speed added when the player is stationary (added to animation root rotation)
+        [SerializeField] float turnSensitivity = 0.2f; // Animator turning sensitivity
 
         [Header("Jumping and Falling")]
         public float airSpeed = 6f; // determines the max speed of the character while airborne
@@ -69,7 +72,6 @@ namespace RingEternal.MyThirdPersonController
         protected Vector3 moveDirection; // The current move direction of the character in Strafe move mode
 
         private Animator animator;
-        private PlayerBlackboard.AnimState _animState;
         private Vector3 normal, platformVelocity, platformAngularVelocity;
         private RaycastHit hit;
         private float jumpLeg, jumpEndTime, forwardMlp, groundDistance, lastAirTime, stickyForce;
@@ -77,14 +79,19 @@ namespace RingEternal.MyThirdPersonController
         private Vector3 moveDirectionVelocity;
         private float wallRunWeight;
         private float lastWallRunWeight;
-        private Vector3 fixedDeltaPosition;
-        private Quaternion fixedDeltaRotation = Quaternion.identity;
+        private Vector3 _fixedDeltaPosition;
+        private Quaternion _fixedDeltaRotation = Quaternion.identity;
+
         private bool fixedFrame;
         private float wallRunEndTime;
         private Vector3 gravity;
         private Vector3 verticalVelocity;
         private float velocityY;
         private bool onGround;
+        private AnimState _animState;
+
+        private Vector3 lastForward;
+        private float deltaAngle;
 
         // Use this for initialization
         protected override void Start()
@@ -92,23 +99,13 @@ namespace RingEternal.MyThirdPersonController
             base.Start();
             wallNormal = -gravity.normalized;
             onGround = true;
-            _animState = new PlayerBlackboard.AnimState();
-            _blackboard.runByDefault = runByDefault;
+            _animState = new AnimState();
+            _blackboard.RunByDefault = runByDefault;
+
+            lastForward = transform.forward;
+
             if (_cam != null) _cam.enabled = false;
         }
-
-        //void OnAnimatorMove() // TODO: Move this to PlayAnimator script
-        //{
-        //    Move(_blackboard.animator.deltaPosition, _blackboard.animator.deltaRotation);
-        //}
-
-        //// When the Animator moves
-        //public override void Move(Vector3 deltaPosition, Quaternion deltaRotation)
-        //{
-        //    // Accumulate delta position, update in FixedUpdate to maintain consitency
-        //    fixedDeltaPosition += deltaPosition;
-        //    fixedDeltaRotation *= deltaRotation;
-        //}
 
         void FixedUpdate()
         {
@@ -120,14 +117,14 @@ namespace RingEternal.MyThirdPersonController
 
             // Smoothing out the fixed time step
             rb.interpolation = smoothPhysics ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
-            _blackboard.smoothFollow = smoothPhysics;
+            _blackboard.SmoothFollow = smoothPhysics;
 
             // Move
-            MoveFixed(fixedDeltaPosition);
-            fixedDeltaPosition = Vector3.zero;
+            MoveFixed(_fixedDeltaPosition);
+            _fixedDeltaPosition = Vector3.zero;
 
-            rb.MoveRotation(transform.rotation * fixedDeltaRotation);
-            fixedDeltaRotation = Quaternion.identity;
+            rb.MoveRotation(transform.rotation * _fixedDeltaRotation);
+            _fixedDeltaRotation = Quaternion.identity;
 
             Rotate();
 
@@ -168,13 +165,21 @@ namespace RingEternal.MyThirdPersonController
 
         protected virtual void Update()
         {
+
+            // Calculate the angular delta in character rotation
+            float angle = -GetAngleFromForward(lastForward) - deltaAngle;
+            deltaAngle = 0f;
+            lastForward = transform.forward;
+            angle *= turnSensitivity * 0.01f;
+            angle = Mathf.Clamp(angle / Time.deltaTime, -1f, 1f);
+            _blackboard.Angle = angle;
             // Fill in animState
             _animState.onGround = onGround;
             _animState.moveDirection = GetMoveDirection();
-            _animState.yVelocity = Mathf.Lerp(_blackboard.animState.yVelocity, velocityY, Time.deltaTime * 10f);
+            _animState.yVelocity = Mathf.Lerp(_animState.yVelocity, velocityY, Time.deltaTime * 10f);
             _animState.crouch = _playerInput.state.crouch;
             _animState.isStrafing = moveMode == MoveMode.Strafe;
-            _blackboard.animState = _animState;
+            _blackboard.AnimState = _animState;
 
         }
 
@@ -191,6 +196,28 @@ namespace RingEternal.MyThirdPersonController
 
             fixedFrame = false;
         }
+
+
+        public void OnAnimatorMove()
+        {
+            if (_useRootPosition)
+            {
+                parentTransform.position = _blackboard.Animator.rootPosition;
+            }
+
+            Move(_blackboard.Animator.deltaPosition, _blackboard.Animator.deltaRotation);
+        }
+
+
+        // When the Animator moves
+        public virtual void Move(Vector3 deltaPosition, Quaternion deltaRotation)
+        {
+
+            // Accumulate delta position, update in FixedUpdate to maintain consistency
+            _fixedDeltaPosition += deltaPosition;
+            _fixedDeltaRotation *= deltaRotation;
+        }
+
 
         private void MoveFixed(Vector3 deltaPosition)
         {
@@ -239,9 +266,22 @@ namespace RingEternal.MyThirdPersonController
             rb.velocity = horizontalVelocity + verticalVelocity;
 
             // Dampering forward speed on the slopes
-            float slopeDamper = !onGround ? 1f : GetSlopeDamper(-_blackboard.deltaPosition / Time.deltaTime, normal);
+            float slopeDamper = !onGround ? 1f : GetSlopeDamper(-_blackboard.Animator.deltaPosition / Time.deltaTime, normal);
             forwardMlp = Mathf.Lerp(forwardMlp, slopeDamper, Time.deltaTime * 5f);
 
+        }
+
+
+        private float CalculateAngularDelta()
+        {
+            // Calculate the angular delta in character rotation
+            float angle = -GetAngleFromForward(lastForward) - deltaAngle;
+            deltaAngle = 0f;
+            lastForward = transform.forward;
+            angle *= turnSensitivity * 0.01f;
+            angle = Mathf.Clamp(angle / Time.deltaTime, -1f, 1f);
+            Debug.Log("Angle " + Mathf.Clamp(angle / Time.deltaTime, -1, 1));
+            return angle;
         }
 
         // Processing horizontal wall running

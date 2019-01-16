@@ -9,7 +9,7 @@ public class InventoryManager : MonoBehaviour
     
     private void Awake()
     {
-        _blackboard.weaponList = _weaponList;
+        _blackboard.WeaponList = _weaponList;
     }
 }
 
