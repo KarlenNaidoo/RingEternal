@@ -12,10 +12,7 @@ namespace RingEternal.MyThirdPersonController
 
 
        
-        [SerializeField] float turnSpeed = 5f; // Animator turning interpolation speed
-        [SerializeField] float runCycleLegOffset = 0.2f; // The offset of leg positions in the running cycle
-        [Range(0.1f, 3f)] [SerializeField] float animSpeedMultiplier = 1; // How much the animation of the character will be multiplied by
-       
+      
         private AnimState _animState;
        
         private float deltaAngle;
@@ -27,9 +24,12 @@ namespace RingEternal.MyThirdPersonController
         [Header("References")]
         [SerializeField] PlayerBlackboard blackboard;
         [SerializeField] ControllerActionManager controllerActionManager;
+        [SerializeField] float turnSpeed = 5f; // Animator turning interpolation speed
+        [SerializeField] float runCycleLegOffset = 0.2f; // The offset of leg positions in the running cycle
+        [Range(0.1f, 3f)] [SerializeField] float animSpeedMultiplier = 1; // How much the animation of the character will be multiplied by
 
         // get Layers from the Animator Controller
-   
+
         private AnimatorStateInfo _baseLayerInfo, _rightArmInfo, _leftArmInfo, _fullBodyInfo, _upperBodyInfo;
         private int _baseLayer
         { get { return blackboard.Animator.GetLayerIndex("Base Layer"); } }
@@ -93,7 +93,6 @@ namespace RingEternal.MyThirdPersonController
 
             // Update Animator params
             blackboard.Animator.SetFloat("Turn", Mathf.Lerp(blackboard.Animator.GetFloat("Turn"), angle, Time.deltaTime * turnSpeed));
-
             blackboard.Animator.SetFloat("Forward", Mathf.Clamp(_animState.moveDirection.z,-1f,1f));
             blackboard.Animator.SetFloat("Right", _animState.moveDirection.x);
             blackboard.Animator.SetBool("Crouch", _animState.crouch);
